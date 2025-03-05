@@ -1,0 +1,69 @@
+<!--<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/2.1.1/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+  </head>
+  <body style="margin: 0px; overflow: hidden;">
+    <a-scene
+      embedded
+      arjs="trackingMethod: gps; sourceType: webcam; debugUIEnabled: false;"
+    >
+      <!-- نموذج ثلاثي الأبعاد يظهر عند الوصول إلى الموقع -->
+     <!-- <a-entity
+        gps-entity-place="latitude: 30.826588; longitude: 27.639844;"
+        gltf-model="https://doahmed123.github.io/my-frist-project/model.gltf"
+        scale="1 1 1"
+        animation-mixer
+      ></a-entity>
+
+      <!-- إعدادات البيئة -->
+     <!-- <a-light type="ambient" intensity="1"></a-light>
+    </a-scene>
+  </body>
+</html>-->
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- مكتبة A-Frame -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <!-- مكتبة AR.js -->
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene
+      embedded
+      arjs="trackingMethod: gps; debugUIEnabled: false;"
+    >
+      <!-- نموذج ثلاثي الأبعاد يظهر عند موقع محدد -->
+      <a-entity
+        gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
+        gltf-model="https://drive.google.com/file/d/1-DdG9pVnhAoGyvs4deJU-eXF8qPpji2i/uc?export=download&id=FILE_ID"
+        scale="1 1 1"
+        animation-mixer
+      >
+        <!-- تحريك النموذج -->
+        <a-animation
+          attribute="rotation"
+          dur="5000"
+          to="0 360 0"
+          repeat="indefinite"
+        ></a-animation>
+      </a-entity>
+
+      <!-- نصوص تعريفية تظهر عند الموقع -->
+      <a-text
+        gps-entity-place="latitude: 40.748817; longitude: -73.985428;"
+        value="هذا نموذج ثلاثي الأبعاد"
+        scale="5 5 5"
+        color="red"
+      ></a-text>
+
+      <!-- إضاءة لتحسين العرض -->
+      <a-light type="ambient" intensity="1"></a-light>
+    </a-scene>
+  </body>
+</html>
