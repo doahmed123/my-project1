@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -11,7 +12,7 @@
       embedded
       arjs="trackingMethod: gps; debugUIEnabled: false;"
     >
-      <!-- نموذج ثلاثي الأبعاد يظهر عند موقع محدد -->
+      <!-- نموذج ثلاثي الأبعاد يظهر عند الموقع المحدد -->
       <a-entity
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ram_of_amun_polycam.glb"
@@ -28,7 +29,7 @@
         ></a-animation>
       </a-entity>
 
-      <!-- نصوص تعريفية تظهر عند الموقع -->
+      <!-- نصوص تعريفية تظهر مع النموذج -->
       <a-text
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         value="تمثال آمون"
