@@ -30,14 +30,14 @@
           repeat="indefinite"
         ></a-animation>
       </a-entity>
-      <a-entity
+      <a-text
         id="description1"
+        value="آمون: أحد الآلهة المصرية القديمة"
         visible="false"
-        position="0 2 -1"
-      >
-        <a-plane color="black" height="0.5" width="2"></a-plane>
-        <a-text value="آمون: أحد الآلهة المصرية القديمة" align="center" color="white" position="0 0 0.1"></a-text>
-      </a-entity>
+        position="0 3 0"
+        align="center"
+        color="red"
+      ></a-text>
 
       <!-- النموذج الثاني -->
       <a-entity
@@ -56,14 +56,14 @@
           repeat="indefinite"
         ></a-animation>
       </a-entity>
-      <a-entity
+      <a-text
         id="description2"
+        value="الأهرامات: أعظم عجائب الدنيا القديمة"
         visible="false"
-        position="0 2 -1"
-      >
-        <a-plane color="black" height="0.5" width="2"></a-plane>
-        <a-text value="الأهرامات: أعظم عجائب الدنيا القديمة" align="center" color="white" position="0 0 0.1"></a-text>
-      </a-entity>
+        position="0 3 0"
+        align="center"
+        color="blue"
+      ></a-text>
 
       <!-- النموذج الثالث -->
       <a-entity
@@ -82,14 +82,14 @@
           repeat="indefinite"
         ></a-animation>
       </a-entity>
-      <a-entity
+      <a-text
         id="description3"
+        value="عصفور: رمز الحياة والحرية"
         visible="false"
-        position="0 2 -1"
-      >
-        <a-plane color="black" height="0.5" width="2"></a-plane>
-        <a-text value="عصفور: رمز الحياة والحرية" align="center" color="white" position="0 0 0.1"></a-text>
-      </a-entity>
+        position="0 3 0"
+        align="center"
+        color="green"
+      ></a-text>
 
       <!-- إضاءة لتحسين العرض -->
       <a-light type="directional" intensity="1" position="1 2 3"></a-light>
@@ -97,39 +97,40 @@
     </a-scene>
 
     <script>
-      // حدث لتكبير وتصغير ودوران المجسم
-      AFRAME.registerComponent('gesture-handler', {
+      // تفعيل التكبير والتصغير بالإيماءات
+      AFRAME.registerComponent("gesture-handler", {
         init: function () {
           const el = this.el;
-          el.addEventListener('gesturestart', function (event) {
-            if (event.scale) {
-              el.object3D.scale.set(event.scale, event.scale, event.scale);
-            }
+          let scale = el.object3D.scale.clone();
+          el.addEventListener("gesturestart", (event) => {
+            scale = el.object3D.scale.clone();
           });
 
-          el.addEventListener('gesturechange', function (event) {
-            if (event.scale) {
-              el.object3D.scale.set(event.scale, event.scale, event.scale);
+          el.addEventListener("gesturechange", (event) => {
+            if (event.detail.scale) {
+              el.object3D.scale.set(
+                scale.x * event.detail.scale,
+                scale.y * event.detail.scale,
+                scale.z * event.detail.scale
+              );
             }
-          });
-
-          el.addEventListener('gestureend', function () {
-            console.log('Gesture ended');
           });
         },
       });
 
-      // إظهار النص عند النقر على المجسمات
+      // عرض النص عند النقر على المجسم
       const toggleDescription = (modelId, descriptionId) => {
-        document.querySelector(modelId).addEventListener('click', () => {
-          const description = document.querySelector(descriptionId);
-          description.setAttribute('visible', !description.getAttribute('visible'));
+        const model = document.querySelector(modelId);
+        const description = document.querySelector(descriptionId);
+        model.addEventListener("click", () => {
+          const isVisible = description.getAttribute("visible");
+          description.setAttribute("visible", !isVisible);
         });
       };
 
-      toggleDescription('#model1', '#description1');
-      toggleDescription('#model2', '#description2');
-      toggleDescription('#model3', '#description3');
+      toggleDescription("#model1", "#description1");
+      toggleDescription("#model2", "#description2");
+      toggleDescription("#model3", "#description3");
     </script>
   </body>
 </html>
