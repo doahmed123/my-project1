@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,7 +5,8 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <!-- مكتبة AR.js -->
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
-     <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+    <!-- مكتبة Gesture Detector -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene
@@ -19,7 +19,9 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/egyptian_column_with_painting.glb"
         position="0 1 0"
         scale="0.5 0.5 0.5"
+        gesture-handler
         animation-mixer
+        id="model1"
       >
         <a-animation
           attribute="rotation"
@@ -28,23 +30,24 @@
           repeat="indefinite"
         ></a-animation>
       </a-entity>
+      <a-entity
+        id="description1"
+        visible="false"
+        position="0 2 -1"
+      >
+        <a-plane color="black" height="0.5" width="2"></a-plane>
+        <a-text value="آمون: أحد الآلهة المصرية القديمة" align="center" color="white" position="0 0 0.1"></a-text>
+      </a-entity>
 
-      <!-- نص تعريف النموذج الأول -->
-      <a-text
-        gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
-        value="آمون"
-        position="0 2 0"
-        scale="5 5 5"
-        color="red"
-      ></a-text>
-     
       <!-- النموذج الثاني -->
       <a-entity
         gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 0"
         scale="1 1 1"
+        gesture-handler
         animation-mixer
+        id="model2"
       >
         <a-animation
           attribute="rotation"
@@ -53,23 +56,24 @@
           repeat="indefinite"
         ></a-animation>
       </a-entity>
+      <a-entity
+        id="description2"
+        visible="false"
+        position="0 2 -1"
+      >
+        <a-plane color="black" height="0.5" width="2"></a-plane>
+        <a-text value="الأهرامات: أعظم عجائب الدنيا القديمة" align="center" color="white" position="0 0 0.1"></a-text>
+      </a-entity>
 
-      <!-- نص تعريف النموذج الثاني -->
-      <a-text
-        gps-entity-place="latitude: 28.128200; longitude: 30.747500;"
-        value="الأهرامات"
-        position="0 2 0"
-        scale="5 5 5"
-        color="blue"
-      ></a-text>
-     
       <!-- النموذج الثالث -->
       <a-entity
         gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ibis.glb"
         position="0 1 0"
         scale="0.7 0.7 0.7"
+        gesture-handler
         animation-mixer
+        id="model3"
       >
         <a-animation
           attribute="rotation"
@@ -78,19 +82,54 @@
           repeat="indefinite"
         ></a-animation>
       </a-entity>
-
-      <!-- نص تعريف النموذج الثالث -->
-      <a-text
-        gps-entity-place="latitude: 28.128300; longitude: 30.748000;"
-        value="عصفور"
-        position="0 2 0"
-        scale="5 5 5"
-        color="green"
-      ></a-text>
+      <a-entity
+        id="description3"
+        visible="false"
+        position="0 2 -1"
+      >
+        <a-plane color="black" height="0.5" width="2"></a-plane>
+        <a-text value="عصفور: رمز الحياة والحرية" align="center" color="white" position="0 0 0.1"></a-text>
+      </a-entity>
 
       <!-- إضاءة لتحسين العرض -->
       <a-light type="directional" intensity="1" position="1 2 3"></a-light>
       <a-light type="ambient" intensity="0.5"></a-light>
     </a-scene>
+
+    <script>
+      // حدث لتكبير وتصغير ودوران المجسم
+      AFRAME.registerComponent('gesture-handler', {
+        init: function () {
+          const el = this.el;
+          el.addEventListener('gesturestart', function (event) {
+            if (event.scale) {
+              el.object3D.scale.set(event.scale, event.scale, event.scale);
+            }
+          });
+
+          el.addEventListener('gesturechange', function (event) {
+            if (event.scale) {
+              el.object3D.scale.set(event.scale, event.scale, event.scale);
+            }
+          });
+
+          el.addEventListener('gestureend', function () {
+            console.log('Gesture ended');
+          });
+        },
+      });
+
+      // إظهار النص عند النقر على المجسمات
+      const toggleDescription = (modelId, descriptionId) => {
+        document.querySelector(modelId).addEventListener('click', () => {
+          const description = document.querySelector(descriptionId);
+          description.setAttribute('visible', !description.getAttribute('visible'));
+        });
+      };
+
+      toggleDescription('#model1', '#description1');
+      toggleDescription('#model2', '#description2');
+      toggleDescription('#model3', '#description3');
+    </script>
   </body>
 </html>
