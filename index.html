@@ -12,15 +12,14 @@
       embedded
       arjs="trackingMethod: gps; debugUIEnabled: false;"
     >
-      <!-- نموذج ثلاثي الأبعاد يظهر عند الموقع المحدد -->
+      <!-- النموذج الأول -->
       <a-entity
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
-        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ram_of_amun_polycam.glb"
-        position="0 1 0" 
+        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/egyptian_column_with_painting.glb"
+        position="0 1 0"
         scale="0.5 0.5 0.5"
         animation-mixer
       >
-        <!-- تحريك النموذج -->
         <a-animation
           attribute="rotation"
           dur="5000"
@@ -29,13 +28,63 @@
         ></a-animation>
       </a-entity>
 
-      <!-- نصوص تعريفية تظهر مع النموذج -->
+      <!-- نص تعريف النموذج الأول -->
       <a-text
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
-        value="تمثال آمون"
-        position="0 2 0" 
+        value="آمون"
+        position="0 2 0"
         scale="5 5 5"
         color="red"
+      ></a-text>
+     
+      <!-- النموذج الثاني -->
+      <a-entity
+        gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
+        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
+        position="0 1 0"
+        scale="1 1 1"
+        animation-mixer
+      >
+        <a-animation
+          attribute="rotation"
+          dur="7000"
+          to="0 -360 0"
+          repeat="indefinite"
+        ></a-animation>
+      </a-entity>
+
+      <!-- نص تعريف النموذج الثاني -->
+      <a-text
+        gps-entity-place="latitude: 28.128200; longitude: 30.747500;"
+        value="الأهرامات"
+        position="0 2 0"
+        scale="5 5 5"
+        color="blue"
+      ></a-text>
+     
+      <!-- النموذج الثالث -->
+      <a-entity
+        gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
+        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ibis.glb"
+        position="0 1 0"
+        scale="0.7 0.7 0.7"
+        animation-mixer
+      >
+        <a-animation
+          attribute="rotation"
+          dur="4000"
+          to="0 360 0"
+          repeat="indefinite"
+        ></a-animation>
+      </a-entity>
+
+      <!-- نص تعريف النموذج الثالث -->
+      <a-text
+        gps-entity-place="latitude: 28.128300; longitude: 30.748000;"
+        value="عصفور"
+        position="0 2 0"
+        scale="5 5 5"
+        color="green"
       ></a-text>
 
       <!-- إضاءة لتحسين العرض -->
@@ -44,4 +93,3 @@
     </a-scene>
   </body>
 </html>
-
