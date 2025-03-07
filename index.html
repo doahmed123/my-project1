@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,8 +11,11 @@
   <body style="margin: 0; overflow: hidden;">
     <a-scene
       embedded
-      arjs="trackingMethod: gps; debugUIEnabled: false;"
+      arjs="trackingMethod: gps; debugUIEnabled: false; sourceType: webcam;"
     >
+      <!-- إزالة الأرضية الافتراضية -->
+      <a-entity camera></a-entity>
+
       <!-- النموذج الأول -->
       <a-entity
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
@@ -21,16 +23,9 @@
         position="0 1 0"
         scale="0.1 0.1 0.1"
         gesture-handler
-        class="zoomable"
+        auto-rotate
         id="model1"
-      >
-        <a-animation
-          attribute="rotation"
-          dur="5000"
-          to="0 360 0"
-          repeat="indefinite"
-        ></a-animation>
-      </a-entity>
+      ></a-entity>
       <a-text
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         value="آمون: أحد الآلهة المصرية القديمة"
@@ -48,16 +43,9 @@
         position="0 1 0"
         scale="0.1 0.1 0.1"
         gesture-handler
-        class="zoomable"
+        auto-rotate
         id="model2"
-      >
-        <a-animation
-          attribute="rotation"
-          dur="7000"
-          to="0 -360 0"
-          repeat="indefinite"
-        ></a-animation>
-      </a-entity>
+      ></a-entity>
       <a-text
         gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
         value="الأهرامات: أعظم عجائب الدنيا القديمة"
@@ -75,16 +63,9 @@
         position="0 1 0"
         scale="0.1 0.1 0.1"
         gesture-handler
-        class="zoomable"
+        auto-rotate
         id="model3"
-      >
-        <a-animation
-          attribute="rotation"
-          dur="4000"
-          to="0 360 0"
-          repeat="indefinite"
-        ></a-animation>
-      </a-entity>
+      ></a-entity>
       <a-text
         gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
         value="عصفور: رمز الحياة والحرية"
@@ -125,6 +106,14 @@
         },
       });
 
+      // مكون التدوير التلقائي
+      AFRAME.registerComponent("auto-rotate", {
+        schema: { speed: { type: "number", default: 0.5 } },
+        tick: function (time, timeDelta) {
+          this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
+        },
+      });
+
       // عرض النص عند النقر على المجسم
       const toggleDescription = (modelId, descriptionId) => {
         const model = document.querySelector(modelId);
@@ -143,4 +132,3 @@
     </script>
   </body>
 </html>
-
