@@ -7,6 +7,8 @@
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
     <!-- مكتبة Gesture Detector -->
     <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
+    <!-- مكتبة TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene
@@ -126,6 +128,23 @@
       toggleDescription("#model1", "#description1");
       toggleDescription("#model2", "#description2");
       toggleDescription("#model3", "#description3");
+
+      // ميزة الذكاء الاصطناعي: تحليل الموقع وإظهار إشعار
+      async function analyzeLocation(latitude, longitude) {
+        const prediction = await tf.tidy(() => {
+          const input = tf.tensor2d([[latitude, longitude]]);
+          return input; // يمكن استبداله بنموذج أكثر تعقيدًا لاحقًا
+        });
+
+        console.log("تحليل الموقع:", prediction.arraySync());
+        prediction.dispose();
+      }
+
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        console.log("الموقع الحالي:", latitude, longitude);
+        analyzeLocation(latitude, longitude);
+      });
     </script>
   </body>
 </html>
