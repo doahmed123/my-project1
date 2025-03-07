@@ -9,19 +9,17 @@
     <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
     <!-- مكتبة A-Frame Extras -->
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras/dist/aframe-extras.controls.min.js"></script>
-    <!-- مكتبة TensorFlow.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene
       embedded
       arjs="trackingMethod: gps; debugUIEnabled: false; sourceType: webcam;"
     >
-      <!-- الكاميرا مع التحكم في الدوران -->
+      <!-- الكاميرا مع التحكم الكامل بالدوران -->
       <a-entity
         camera
-        orbit-controls="autoRotate: true; autoRotateSpeed: 0.5; enableDamping: true; dampingFactor: 0.2; rotateSpeed: 0.2;"
-        position="0 1.6 3"
+        position="0 2 5"
+        orbit-controls="autoRotate: true; autoRotateSpeed: 0.2; enableDamping: true; dampingFactor: 0.2; rotateSpeed: 0.3; maxPolarAngle: 1.5; minPolarAngle: 0;"
       ></a-entity>
 
       <!-- النموذج الأول -->
@@ -34,15 +32,6 @@
         gesture-handler
         id="model1"
       ></a-entity>
-      <a-text
-        gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
-        value="آمون: أحد الآلهة المصرية القديمة"
-        visible="false"
-        position="0 3 0"
-        align="center"
-        color="red"
-        id="description1"
-      ></a-text>
 
       <!-- النموذج الثاني -->
       <a-entity
@@ -54,15 +43,6 @@
         gesture-handler
         id="model2"
       ></a-entity>
-      <a-text
-        gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
-        value="الأهرامات: أعظم عجائب الدنيا القديمة"
-        visible="false"
-        position="0 3 0"
-        align="center"
-        color="blue"
-        id="description2"
-      ></a-text>
 
       <!-- النموذج الثالث -->
       <a-entity
@@ -74,15 +54,6 @@
         gesture-handler
         id="model3"
       ></a-entity>
-      <a-text
-        gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
-        value="عصفور: رمز الحياة والحرية"
-        visible="false"
-        position="0 3 0"
-        align="center"
-        color="green"
-        id="description3"
-      ></a-text>
 
       <!-- إضاءة لتحسين العرض -->
       <a-light type="directional" intensity="1" position="1 2 3"></a-light>
@@ -112,39 +83,6 @@
             }
           });
         },
-      });
-
-      // عرض النص عند النقر على المجسم
-      const toggleDescription = (modelId, descriptionId) => {
-        const model = document.querySelector(modelId);
-        const description = document.querySelector(descriptionId);
-
-        model.addEventListener("click", () => {
-          const isVisible = description.getAttribute("visible") === "true";
-          description.setAttribute("visible", !isVisible);
-        });
-      };
-
-      // تفعيل النصوص لكل مجسم
-      toggleDescription("#model1", "#description1");
-      toggleDescription("#model2", "#description2");
-      toggleDescription("#model3", "#description3");
-
-      // ميزة الذكاء الاصطناعي: تحليل الموقع وإظهار إشعار
-      async function analyzeLocation(latitude, longitude) {
-        const prediction = await tf.tidy(() => {
-          const input = tf.tensor2d([[latitude, longitude]]);
-          return input; // يمكن استبداله بنموذج أكثر تعقيدًا لاحقًا
-        });
-
-        console.log("تحليل الموقع:", prediction.arraySync());
-        prediction.dispose();
-      }
-
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        console.log("الموقع الحالي:", latitude, longitude);
-        analyzeLocation(latitude, longitude);
       });
     </script>
   </body>
