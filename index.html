@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -18,7 +19,7 @@
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/egyptian_column_with_painting.glb"
         position="0 1 0"
-        scale="0.3 0.3 0.3"
+        scale="0.1 0.1 0.1"
         gesture-handler
         class="zoomable"
         id="model1"
@@ -45,7 +46,7 @@
         gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 0"
-        scale="0.5 0.5 0.5"
+        scale="0.1 0.1 0.1"
         gesture-handler
         class="zoomable"
         id="model2"
@@ -72,7 +73,7 @@
         gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ibis.glb"
         position="0 1 0"
-        scale="0.4 0.4 0.4"
+        scale="0.1 0.1 0.1"
         gesture-handler
         class="zoomable"
         id="model3"
@@ -100,7 +101,7 @@
     </a-scene>
 
     <script>
-      // تسجيل مكون لتكبير وتصغير المجسمات باستخدام الفأرة واللمس
+      // مكون التكبير والتصغير
       AFRAME.registerComponent("gesture-handler", {
         init: function () {
           const el = this.el;
@@ -120,14 +121,6 @@
                 initialScale.z * newScale
               );
             }
-          });
-
-          // تكبير وتصغير باستخدام عجلة الفأرة (Mouse Scroll)
-          el.sceneEl.addEventListener("wheel", (event) => {
-            const delta = event.deltaY > 0 ? -0.1 : 0.1; // تحديد الاتجاه
-            const currentScale = el.object3D.scale;
-            const newScale = Math.max(0.1, currentScale.x + delta); // منع الحجم السلبي
-            el.object3D.scale.set(newScale, newScale, newScale);
           });
         },
       });
@@ -150,3 +143,4 @@
     </script>
   </body>
 </html>
+
