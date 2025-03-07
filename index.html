@@ -7,23 +7,30 @@
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
     <!-- مكتبة Gesture Detector -->
     <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
-    <!-- مكتبة TensorFlow.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <!-- مكتبة A-Frame Extras -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras/dist/aframe-extras.controls.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene
       embedded
       arjs="trackingMethod: gps; debugUIEnabled: false; sourceType: webcam;"
     >
+      <!-- الكاميرا مع التحكم في الدوران -->
+      <a-entity
+        camera
+        orbit-controls="autoRotate: true; autoRotateSpeed: 0.5; enableDamping: true; dampingFactor: 0.2; rotateSpeed: 0.2;"
+        look-controls
+        position="0 1.6 3"
+      ></a-entity>
+
       <!-- النموذج الأول -->
       <a-entity
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/egyptian_column_with_painting.glb"
         position="0 1 0"
         scale="0.1 0.1 0.1"
-        rotation="0 0 0" <!-- تعديل الإتجاه الافتراضي -->
+        rotation="0 0 0"
         gesture-handler
-        auto-rotate
         id="model1"
       ></a-entity>
       <a-text
@@ -42,9 +49,8 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 0"
         scale="0.1 0.1 0.1"
-        rotation="90 0 0" <!-- تعديل الإتجاه الافتراضي -->
+        rotation="0 0 0"
         gesture-handler
-        auto-rotate
         id="model2"
       ></a-entity>
       <a-text
@@ -63,9 +69,8 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ibis.glb"
         position="0 1 0"
         scale="0.1 0.1 0.1"
-        rotation="90 0 0" <!-- تعديل الإتجاه الافتراضي -->
+        rotation="0 0 0"
         gesture-handler
-        auto-rotate
         id="model3"
       ></a-entity>
       <a-text
@@ -108,14 +113,6 @@
         },
       });
 
-      // مكون التدوير التلقائي
-      AFRAME.registerComponent("auto-rotate", {
-        schema: { speed: { type: "number", default: 0.5 } },
-        tick: function (time, timeDelta) {
-          this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
-        },
-      });
-
       // عرض النص عند النقر على المجسم
       const toggleDescription = (modelId, descriptionId) => {
         const model = document.querySelector(modelId);
@@ -131,23 +128,6 @@
       toggleDescription("#model1", "#description1");
       toggleDescription("#model2", "#description2");
       toggleDescription("#model3", "#description3");
-
-      // ميزة الذكاء الاصطناعي: تحليل الموقع وإظهار إشعار
-      async function analyzeLocation(latitude, longitude) {
-        const prediction = await tf.tidy(() => {
-          const input = tf.tensor2d([[latitude, longitude]]);
-          return input; // يمكن استبداله بنموذج أكثر تعقيدًا لاحقًا
-        });
-
-        console.log("تحليل الموقع:", prediction.arraySync());
-        prediction.dispose();
-      }
-
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        console.log("الموقع الحالي:", latitude, longitude);
-        analyzeLocation(latitude, longitude);
-      });
     </script>
   </body>
 </html>
