@@ -13,9 +13,6 @@
       embedded
       arjs="trackingMethod: gps; debugUIEnabled: false; sourceType: webcam;"
     >
-      <!-- الأرضية الافتراضية -->
-      <a-plane position="0 0 0" rotation="-90 0 0" width="500" height="500" color="#cccccc"></a-plane>
-
       <!-- النموذج الأول -->
       <a-entity
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
@@ -113,51 +110,6 @@
           this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
         },
       });
-
-      // AI للتعرف على الموقع الأقرب
-      function findNearestLocation(currentLocation, models) {
-        let nearestModel = null;
-        let minDistance = Infinity;
-
-        models.forEach((model) => {
-          const latDiff = currentLocation.latitude - model.latitude;
-          const lonDiff = currentLocation.longitude - model.longitude;
-          const distance = Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestModel = model;
-          }
-        });
-
-        return nearestModel;
-      }
-
-      // استخدام GeoLocation API
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const currentLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-
-          const models = [
-            { id: "#model1", latitude: 28.128135, longitude: 30.747033 },
-            { id: "#model2", latitude: 28.128430, longitude: 30.747023 },
-            { id: "#model3", latitude: 28.128347, longitude: 30.747051 },
-          ];
-
-          const nearestModel = findNearestLocation(currentLocation, models);
-
-          if (nearestModel) {
-            alert(`أقرب نموذج هو: ${nearestModel.id}`);
-          } else {
-            alert("لا توجد نماذج قريبة.");
-          }
-        });
-      } else {
-        alert("ميزة الموقع غير مدعومة في هذا المتصفح.");
-      }
 
       // عرض النص عند النقر على المجسم
       const toggleDescription = (modelId, descriptionId) => {
