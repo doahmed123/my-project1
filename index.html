@@ -18,18 +18,19 @@
       arjs="trackingMethod: gps; debugUIEnabled: false; sourceType: webcam;"
     >
       <!-- الكاميرا مع التحكم الكامل بالدوران -->
-      <a-entity
-        camera
-        position="0 2 5"
-        orbit-controls="autoRotate: true; autoRotateSpeed: 0.5; enableDamping: true; dampingFactor: 0.2; rotateSpeed: 0.3;"
-      ></a-entity>
+      <a-camera
+        gps-camera
+        orbit-controls="autoRotate: true; autoRotateSpeed: 0.2; enableDamping: true; dampingFactor: 0.25;"
+        position="0 1.6 3"
+      ></a-camera>
 
       <!-- النموذج الأول -->
       <a-entity
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/egyptian_column_with_painting.glb"
         position="0 0 0"
-        scale="1 1 1"
+        scale="0.5 0.5 0.5"
+        rotation="0 45 0"
         auto-rotate
         gesture-handler
         id="model1"
@@ -39,8 +40,9 @@
       <a-entity
         gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
-        position="3 0 0"
-        scale="1 1 1"
+        position="2 0 0"
+        scale="0.5 0.5 0.5"
+        rotation="0 -45 0"
         auto-rotate
         gesture-handler
         id="model2"
@@ -50,8 +52,9 @@
       <a-entity
         gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ibis.glb"
-        position="-3 0 0"
-        scale="1 1 1"
+        position="-2 0 0"
+        scale="0.5 0.5 0.5"
+        rotation="0 90 0"
         auto-rotate
         gesture-handler
         id="model3"
@@ -59,7 +62,7 @@
 
       <!-- إضاءة لتحسين العرض -->
       <a-light type="directional" intensity="1" position="1 2 3"></a-light>
-      <a-light type="ambient" intensity="0.5"></a-light>
+      <a-light type="ambient" intensity="0.8"></a-light>
     </a-scene>
 
     <script>
@@ -89,7 +92,7 @@
 
       // مكون التدوير التلقائي
       AFRAME.registerComponent("auto-rotate", {
-        schema: { speed: { type: "number", default: 0.5 } },
+        schema: { speed: { type: "number", default: 0.2 } },
         tick: function (time, timeDelta) {
           this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
         },
