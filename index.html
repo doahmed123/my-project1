@@ -31,12 +31,13 @@
         ></a-animation>
       </a-entity>
       <a-text
-        id="description1"
+        gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         value="آمون: أحد الآلهة المصرية القديمة"
         visible="false"
         position="0 3 0"
         align="center"
         color="red"
+        id="description1"
       ></a-text>
 
       <!-- النموذج الثاني -->
@@ -57,12 +58,13 @@
         ></a-animation>
       </a-entity>
       <a-text
-        id="description2"
+        gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
         value="الأهرامات: أعظم عجائب الدنيا القديمة"
         visible="false"
         position="0 3 0"
         align="center"
         color="blue"
+        id="description2"
       ></a-text>
 
       <!-- النموذج الثالث -->
@@ -83,12 +85,13 @@
         ></a-animation>
       </a-entity>
       <a-text
-        id="description3"
+        gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
         value="عصفور: رمز الحياة والحرية"
         visible="false"
         position="0 3 0"
         align="center"
         color="green"
+        id="description3"
       ></a-text>
 
       <!-- إضاءة لتحسين العرض -->
@@ -101,17 +104,19 @@
       AFRAME.registerComponent("gesture-handler", {
         init: function () {
           const el = this.el;
-          let scale = el.object3D.scale.clone();
-          el.addEventListener("gesturestart", (event) => {
-            scale = el.object3D.scale.clone();
+          let initialScale = el.object3D.scale.clone();
+
+          el.addEventListener("gesturestart", () => {
+            initialScale = el.object3D.scale.clone();
           });
 
           el.addEventListener("gesturechange", (event) => {
             if (event.detail.scale) {
+              const newScale = event.detail.scale;
               el.object3D.scale.set(
-                scale.x * event.detail.scale,
-                scale.y * event.detail.scale,
-                scale.z * event.detail.scale
+                initialScale.x * newScale,
+                initialScale.y * newScale,
+                initialScale.z * newScale
               );
             }
           });
@@ -122,12 +127,14 @@
       const toggleDescription = (modelId, descriptionId) => {
         const model = document.querySelector(modelId);
         const description = document.querySelector(descriptionId);
+
         model.addEventListener("click", () => {
-          const isVisible = description.getAttribute("visible");
+          const isVisible = description.getAttribute("visible") === "true";
           description.setAttribute("visible", !isVisible);
         });
       };
 
+      // تفعيل النصوص لكل مجسم
       toggleDescription("#model1", "#description1");
       toggleDescription("#model2", "#description2");
       toggleDescription("#model3", "#description3");
