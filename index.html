@@ -11,7 +11,7 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -5"
         scale="3 3 3"
-        horizontal-rotation
+        free-rotation
         pinch-to-scale
         id="model1"
       ></a-entity>
@@ -22,9 +22,9 @@
     </a-scene>
 
     <script>
-      // مكون لتدوير النموذج يدويًا حول المحور Y فقط
-      AFRAME.registerComponent("horizontal-rotation", {
-        schema: { rotationSpeed: { type: "number", default: 0.5 } },
+      // مكون يسمح بالدوران الحر (حول المحاور X و Y و Z)
+      AFRAME.registerComponent("free-rotation", {
+        schema: { rotationSpeed: { type: "number", default: 1 } },
         init: function () {
           this.startPosition = null;
         },
@@ -42,18 +42,26 @@
         },
         onTouchStart: function (event) {
           if (event.touches.length === 1) {
-            this.startPosition = { x: event.touches[0].clientX };
+            this.startPosition = {
+              x: event.touches[0].clientX,
+              y: event.touches[0].clientY,
+            };
           }
         },
         onTouchMove: function (event) {
           if (event.touches.length === 1 && this.startPosition) {
             const touch = event.touches[0];
             const deltaX = touch.clientX - this.startPosition.x;
+            const deltaY = touch.clientY - this.startPosition.y;
 
-            // تدوير النموذج حول المحور Y فقط
+            // تدوير النموذج حول المحاور X و Y
             this.el.object3D.rotation.y -= deltaX * this.data.rotationSpeed * 0.01;
+            this.el.object3D.rotation.x -= deltaY * this.data.rotationSpeed * 0.01;
 
-            this.startPosition = { x: touch.clientX };
+            this.startPosition = {
+              x: touch.clientX,
+              y: touch.clientY,
+            };
           }
         },
         onTouchEnd: function () {
