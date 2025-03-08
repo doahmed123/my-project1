@@ -2,23 +2,17 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
-    <a-scene
-      embedded
-      arjs="trackingMethod: gps; debugUIEnabled: false; sourceType: webcam;"
-    >
+    <a-scene embedded>
       <!-- النموذج -->
       <a-entity
-        gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -5"
         scale="3 3 3"
-        rotation-handler
+        horizontal-rotation
         pinch-to-scale
-        auto-rotate="speed: 0.5"
         id="model1"
       ></a-entity>
 
@@ -28,8 +22,8 @@
     </a-scene>
 
     <script>
-      // مكون لتحريك النموذج (الدوران حول المحاور X و Y)
-      AFRAME.registerComponent("rotation-handler", {
+      // مكون لتدوير النموذج يدويًا حول المحور Y فقط
+      AFRAME.registerComponent("horizontal-rotation", {
         schema: { rotationSpeed: { type: "number", default: 0.5 } },
         init: function () {
           this.startPosition = null;
@@ -48,20 +42,18 @@
         },
         onTouchStart: function (event) {
           if (event.touches.length === 1) {
-            this.startPosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+            this.startPosition = { x: event.touches[0].clientX };
           }
         },
         onTouchMove: function (event) {
           if (event.touches.length === 1 && this.startPosition) {
             const touch = event.touches[0];
             const deltaX = touch.clientX - this.startPosition.x;
-            const deltaY = touch.clientY - this.startPosition.y;
 
-            // تحريك النموذج
-            this.el.object3D.rotation.y -= deltaX * this.data.rotationSpeed * 0.01; // دوران حول Y
-            this.el.object3D.rotation.x -= deltaY * this.data.rotationSpeed * 0.01; // دوران حول X
+            // تدوير النموذج حول المحور Y فقط
+            this.el.object3D.rotation.y -= deltaX * this.data.rotationSpeed * 0.01;
 
-            this.startPosition = { x: touch.clientX, y: touch.clientY };
+            this.startPosition = { x: touch.clientX };
           }
         },
         onTouchEnd: function () {
@@ -96,14 +88,6 @@
             this.initialScale.y * scaleFactor,
             this.initialScale.z * scaleFactor
           );
-        },
-      });
-
-      // مكون للدوران التلقائي للنموذج
-      AFRAME.registerComponent("auto-rotate", {
-        schema: { speed: { type: "number", default: 0.5 } },
-        tick: function (time, timeDelta) {
-          this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
         },
       });
     </script>
