@@ -1,259 +1,79 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- مكتبة A-Frame -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <!-- مكتبة AR.js -->
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
-    <!-- مكتبة Gesture Detector -->
     <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
-    <!-- مكتبة TensorFlow.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene
       embedded
       arjs="trackingMethod: gps; debugUIEnabled: false; sourceType: webcam;"
     >
-      <!-- النموذج الأول -->
+      <!-- النموذج -->
       <a-entity
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
-        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/egyptian_column_with_painting.glb"
-        position="0 0.5 0"
-        scale="0.1 0.1 0.1"
+        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
+        position="0 1 -5"
+        scale="3 3 3"
         gesture-handler
-        auto-rotate
         id="model1"
       ></a-entity>
-      <a-text
-        gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
-        value="آمون: أحد الآلهة المصرية القديمة"
-        visible="false"
-        position="0 2 0"
-        align="center"
-        color="red"
-        id="description1"
-      ></a-text>
 
-      <!-- النموذج الثاني -->
-      <a-entity
-        gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
-        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
-        position="0 0.5 0"
-        scale="0.2 0.2 0.2"
-        gesture-handler
-        auto-rotate
-        id="model2"
-      ></a-entity>
-      <a-text
-        gps-entity-place="latitude: 28.128430; longitude: 30.747023;"
-        value="الأهرامات: أعظم عجائب الدنيا القديمة"
-        visible="false"
-        position="0 2 0"
-        align="center"
-        color="blue"
-        id="description2"
-      ></a-text>
-
-      <!-- النموذج الثالث -->
-      <a-entity
-        gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
-        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/ibis.glb"
-        position="0 0.5 0"
-        scale="0.1 0.1 0.1"
-        gesture-handler
-        auto-rotate
-        id="model3"
-      ></a-entity>
-      <a-text
-        gps-entity-place="latitude: 28.128347; longitude: 30.747051;"
-        value="عصفور: رمز الحياة والحرية"
-        visible="false"
-        position="0 2 0"
-        align="center"
-        color="green"
-        id="description3"
-      ></a-text>
-
-      <!-- إضاءة لتحسين العرض -->
+      <!-- الإضاءة -->
       <a-light type="directional" intensity="1" position="1 2 3"></a-light>
       <a-light type="ambient" intensity="0.5"></a-light>
     </a-scene>
+
     <script>
-
-      // مكون التكبير والتصغير
+      // مكون Gesture Handler للتحكم في التدوير والتكبير/التصغير
       AFRAME.registerComponent("gesture-handler", {
+        schema: {
+          rotationFactor: { type: "number", default: 5 }, // معدل التدوير
+          scaleFactor: { type: "number", default: 0.1 },  // معدل التكبير/التصغير
+        },
         init: function () {
-          const el = this.el;
-          let initialScale = el.object3D.scale.clone();
+          this.initialScale = this.el.object3D.scale.clone();
+          this.initialRotation = this.el.object3D.rotation.clone();
+          this.startPosition = null;
 
-          // تكبير وتصغير باستخدام الإيماءات (Pinch Gesture)
-          el.addEventListener("gesturestart", () => {
-            initialScale = el.object3D.scale.clone();
+          // الاستماع إلى الإيماءات
+          this.el.sceneEl.addEventListener("gesturestart", (event) => {
+            this.startPosition = null;
           });
 
-          el.addEventListener("gesturechange", (event) => {
+          this.el.sceneEl.addEventListener("gesturechange", (event) => {
+            // تكبير أو تصغير
             if (event.detail.scale) {
               const newScale = event.detail.scale;
-              el.object3D.scale.set(
-                initialScale.x * newScale,
-                initialScale.y * newScale,
-                initialScale.z * newScale
+              this.el.object3D.scale.set(
+                this.initialScale.x * newScale,
+                this.initialScale.y * newScale,
+                this.initialScale.z * newScale
               );
+            }
+          });
+
+          this.el.sceneEl.addEventListener("touchmove", (event) => {
+            if (event.touches.length === 1) {
+              const touch = event.touches[0];
+
+              if (this.startPosition === null) {
+                this.startPosition = { x: touch.clientX, y: touch.clientY };
+                return;
+              }
+
+              const deltaX = touch.clientX - this.startPosition.x;
+              const deltaY = touch.clientY - this.startPosition.y;
+
+              this.el.object3D.rotation.y += deltaX * (this.data.rotationFactor / 1000);
+              this.el.object3D.rotation.x += deltaY * (this.data.rotationFactor / 1000);
+
+              this.startPosition = { x: touch.clientX, y: touch.clientY };
             }
           });
         },
       });
-
-      // مكون التدوير التلقائي
-      AFRAME.registerComponent("auto-rotate", {
-        schema: { speed: { type: "number", default: 0.5 } },
-        tick: function (time, timeDelta) {
-          this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
-        },
-      });
-
-      // AI للتعرف على الموقع الأقرب
-      function findNearestLocation(currentLocation, models) {
-        let nearestModel = null;
-        let minDistance = Infinity;
-
-        models.forEach((model) => {
-          const latDiff = currentLocation.latitude - model.latitude;
-          const lonDiff = currentLocation.longitude - model.longitude;
-          const distance = Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestModel = model;
-          }
-        });
-
-        return nearestModel;
-      }
-
-      // استخدام GeoLocation API
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const currentLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-
-          const models = [
-            { id: "#model1", latitude: 28.128135, longitude: 30.747033 },
-            { id: "#model2", latitude: 28.128430, longitude: 30.747023 },
-            { id: "#model3", latitude: 28.128347, longitude: 30.747051 },
-          ];
-
-          const nearestModel = findNearestLocation(currentLocation, models);
-
-          if (nearestModel) {
-            alert(`أقرب نموذج هو: ${nearestModel.id}`);
-          } else {
-            alert("لا توجد نماذج قريبة.");
-          }
-        });
-      } else {
-        alert("ميزة الموقع غير مدعومة في هذا المتصفح.");
-      }
-
-      // عرض النص عند النقر على المجسم
-      const toggleDescription = (modelId, descriptionId) => {
-        const model = document.querySelector(modelId);
-        const description = document.querySelector(descriptionId);
-
-        model.addEventListener("click", () => {
-          const isVisible = description.getAttribute("visible") === "true";
-          description.setAttribute("visible", !isVisible);
-        });
-      };
-
-      // تفعيل النصوص لكل مجسم
-      toggleDescription("#model1", "#description1");
-      toggleDescription("#model2", "#description2");
-      toggleDescription("#model3", "#description3");
-
-      
-      async function analyzeLocation(latitude, longitude) {
-        const prediction = await tf.tidy(() => {
-          const input = tf.tensor2d([[latitude, longitude]]);
-          return input; // يمكن استبداله بنموذج أكثر تعقيدًا لاحقًا
-        });
-
-        console.log("تحليل الموقع:", prediction.arraySync());
-        prediction.dispose();
-      }
-
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        console.log("الموقع الحالي:", latitude, longitude);
-        analyzeLocation(latitude, longitude);
-      });
-      
-    </script>
-    <!-- ميزات AI -->
-    <script>
-      // AI: تحليل الموقع
-      async function analyzeLocation(latitude, longitude) {
-        const prediction = await tf.tidy(() => {
-          const input = tf.tensor2d([[latitude, longitude]]);
-          return input.mean().dataSync()[0];
-        });
-        console.log("نتيجة تحليل الموقع:", prediction);
-      }
-
-      // استخدام GeoLocation API
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const { latitude, longitude } = position.coords;
-          console.log("الموقع الحالي:", latitude, longitude);
-          await analyzeLocation(latitude, longitude);
-        });
-      } else {
-        alert("ميزة الموقع غير مدعومة.");
-      }
-
-      // AI: تحليل التفاعل مع المجسمات
-      const interactionData = { model1: 0, model2: 0, model3: 0 };
-      const registerClick = (modelId) => {
-        interactionData[modelId]++;
-        console.log(`عدد النقرات على ${modelId}: ${interactionData[modelId]}`);
-      };
-
-      document.querySelector("#model1").addEventListener("click", () => registerClick("model1"));
-      document.querySelector("#model2").addEventListener("click", () => registerClick("model2"));
-      document.querySelector("#model3").addEventListener("click", () => registerClick("model3"));
-
-      // AI: التعرف الصوتي
-      const startVoiceRecognition = () => {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = "ar-EG"; // العربية - مصر
-        recognition.onresult = (event) => {
-          const command = event.results[0][0].transcript.toLowerCase();
-          console.log("الأمر الصوتي:", command);
-
-          if (command.includes("آمون")) {
-            document.querySelector("#description1").setAttribute("visible", true);
-          } else if (command.includes("الأهرامات")) {
-            document.querySelector("#description2").setAttribute("visible", true);
-          } else if (command.includes("العصفور")) {
-            document.querySelector("#description3").setAttribute("visible", true);
-          } else {
-            alert("لم يتم التعرف على الأمر.");
-          }
-        };
-
-        recognition.start();
-      };
-
-      const voiceButton = document.createElement("button");
-      voiceButton.textContent = "تفعيل التعرف الصوتي";
-      voiceButton.style.position = "fixed";
-      voiceButton.style.top = "10px";
-      voiceButton.style.right = "10px";
-      voiceButton.onclick = startVoiceRecognition;
-      document.body.appendChild(voiceButton);
     </script>
   </body>
 </html>
