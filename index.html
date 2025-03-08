@@ -7,20 +7,13 @@
     <a-scene>
       <!-- النموذج ثلاثي الأبعاد -->
       <a-entity
+        id="model"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -3"
         scale="1 1 1"
-        id="model"
-      ></a-entity>
-
-      <!-- علامة الدوران -->
-      <a-circle
-        position="0 0.5 -2.5"
-        radius="0.5"
-        color="#ff5722"
+        rotation="0 0 0"
         rotation-handler
-        id="rotation-control"
-      ></a-circle>
+      ></a-entity>
 
       <!-- الإضاءة -->
       <a-light type="directional" intensity="1" position="1 3 1"></a-light>
@@ -28,35 +21,74 @@
     </a-scene>
 
     <script>
-      // مكون التعامل مع علامة الدوران
+      // مكون التعامل مع الدوران الحر
       AFRAME.registerComponent("rotation-handler", {
+        schema: {
+          rotationSpeed: { type: "number", default: 0.5 }, // سرعة الدوران
+        },
         init: function () {
-          const model = document.querySelector("#model").object3D;
-          this.isDragging = false; // لتعقب حالة السحب
+          this.isDragging = false; // حالة السحب
           this.previousMousePosition = { x: 0, y: 0 }; // موقع الماوس السابق
+          const el = this.el;
 
-          // عند الضغط على العلامة
-          this.el.addEventListener("mousedown", (event) => {
+          // عند بدء السحب بالماوس
+          el.sceneEl.canvas.addEventListener("mousedown", (event) => {
             this.isDragging = true;
             this.previousMousePosition = { x: event.clientX, y: event.clientY };
           });
 
           // عند تحريك الماوس
-          window.addEventListener("mousemove", (event) => {
+          el.sceneEl.canvas.addEventListener("mousemove", (event) => {
             if (!this.isDragging) return;
 
             const deltaX = event.clientX - this.previousMousePosition.x;
+            const deltaY = event.clientY - this.previousMousePosition.y;
 
-            const rotationSpeed = 0.005; // سرعة الدوران
+            // تعديل دوران النموذج بناءً على حركة الماوس
+            const object3D = el.object3D;
+            object3D.rotation.y += deltaX * this.data.rotationSpeed * 0.001;
+            object3D.rotation.x += deltaY * this.data.rotationSpeed * 0.001;
 
-            // تحديث دوران النموذج بناءً على حركة الماوس
-            model.rotation.y += deltaX * rotationSpeed;
-
+            // تحديث موقع الماوس السابق
             this.previousMousePosition = { x: event.clientX, y: event.clientY };
           });
 
-          // عند إفلات زر الماوس
+          // عند إفلات الماوس
           window.addEventListener("mouseup", () => {
+            this.isDragging = false;
+          });
+
+          // دعم اللمس للشاشات اللمسية
+          el.sceneEl.canvas.addEventListener("touchstart", (event) => {
+            this.isDragging = true;
+            this.previousMousePosition = {
+              x: event.touches[0].clientX,
+              y: event.touches[0].clientY,
+            };
+          });
+
+          el.sceneEl.canvas.addEventListener("touchmove", (event) => {
+            if (!this.isDragging) return;
+
+            const deltaX =
+              event.touches[0].clientX - this.previousMousePosition.x;
+            const deltaY =
+              event.touches[0].clientY - this.previousMousePosition.y;
+
+            // تعديل دوران النموذج بناءً على حركة اللمس
+            const object3D = el.object3D;
+            object3D.rotation.y += deltaX * this.data.rotationSpeed * 0.001;
+            object3D.rotation.x += deltaY * this.data.rotationSpeed * 0.001;
+
+            // تحديث موقع اللمس السابق
+            this.previousMousePosition = {
+              x: event.touches[0].clientX,
+              y: event.touches[0].clientY,
+            };
+          });
+
+          // عند إنهاء اللمس
+          window.addEventListener("touchend", () => {
             this.isDragging = false;
           });
         },
