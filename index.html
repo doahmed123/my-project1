@@ -2,7 +2,6 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector/dist/aframe-gesture-detector.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene embedded>
@@ -11,8 +10,8 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -5"
         scale="3 3 3"
-        free-rotation
-        pinch-to-scale
+        auto-rotate
+        gesture-handler
         id="model1"
       ></a-entity>
 
@@ -22,9 +21,17 @@
     </a-scene>
 
     <script>
-      // مكون يسمح بالدوران الحر (حول المحاور X و Y و Z)
-      AFRAME.registerComponent("free-rotation", {
-        schema: { rotationSpeed: { type: "number", default: 1 } },
+      // مكون التدوير التلقائي حول المحور Y (لتدوير النموذج حول نفسه)
+      AFRAME.registerComponent("auto-rotate", {
+        schema: { speed: { type: "number", default: 0.5 } }, // سرعة الدوران
+        tick: function (time, timeDelta) {
+          this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
+        },
+      });
+
+      // مكون التحكم اليدوي في الدوران
+      AFRAME.registerComponent("gesture-handler", {
+        schema: { rotationSpeed: { type: "number", default: 0.5 } },
         init: function () {
           this.startPosition = null;
         },
@@ -54,9 +61,9 @@
             const deltaX = touch.clientX - this.startPosition.x;
             const deltaY = touch.clientY - this.startPosition.y;
 
-            // تدوير النموذج حول المحاور X و Y
-            this.el.object3D.rotation.y -= deltaX * this.data.rotationSpeed * 0.01;
-            this.el.object3D.rotation.x -= deltaY * this.data.rotationSpeed * 0.01;
+            // تدوير النموذج حول المحاور X و Y يدوياً
+            this.el.object3D.rotation.y += deltaX * this.data.rotationSpeed * 0.01;
+            this.el.object3D.rotation.x += deltaY * this.data.rotationSpeed * 0.01;
 
             this.startPosition = {
               x: touch.clientX,
@@ -66,36 +73,6 @@
         },
         onTouchEnd: function () {
           this.startPosition = null;
-        },
-      });
-
-      // مكون لتكبير وتصغير النموذج باستخدام إصبعين
-      AFRAME.registerComponent("pinch-to-scale", {
-        schema: { scaleSpeed: { type: "number", default: 0.01 } },
-        init: function () {
-          this.initialScale = this.el.object3D.scale.clone();
-        },
-        play: function () {
-          const scene = this.el.sceneEl;
-          scene.addEventListener("gesturestart", this.onGestureStart.bind(this));
-          scene.addEventListener("gesturechange", this.onGestureChange.bind(this));
-        },
-        pause: function () {
-          const scene = this.el.sceneEl;
-          scene.removeEventListener("gesturestart", this.onGestureStart.bind(this));
-          scene.removeEventListener("gesturechange", this.onGestureChange.bind(this));
-        },
-        onGestureStart: function () {
-          this.initialScale = this.el.object3D.scale.clone();
-        },
-        onGestureChange: function (event) {
-          const scaleFactor = event.scale;
-
-          this.el.object3D.scale.set(
-            this.initialScale.x * scaleFactor,
-            this.initialScale.y * scaleFactor,
-            this.initialScale.z * scaleFactor
-          );
         },
       });
     </script>
