@@ -10,69 +10,64 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -5"
         scale="3 3 3"
-        auto-rotate
-        gesture-handler
+        rotation-handler
         id="model1"
       ></a-entity>
 
-      <!-- الإضاءة -->
+      <!-- الإضاءة لتحسين الرؤية -->
       <a-light type="directional" intensity="1" position="1 2 3"></a-light>
       <a-light type="ambient" intensity="0.5"></a-light>
     </a-scene>
 
     <script>
-      // مكون التدوير التلقائي حول المحور Y (لتدوير النموذج حول نفسه)
-      AFRAME.registerComponent("auto-rotate", {
-        schema: { speed: { type: "number", default: 0.5 } }, // سرعة الدوران
-        tick: function (time, timeDelta) {
-          this.el.object3D.rotation.y += this.data.speed * (timeDelta / 1000);
-        },
-      });
-
-      // مكون التحكم اليدوي في الدوران
-      AFRAME.registerComponent("gesture-handler", {
+      // مكون التحكم اليدوي في دوران النموذج حول جميع المحاور
+      AFRAME.registerComponent("rotation-handler", {
         schema: { rotationSpeed: { type: "number", default: 0.5 } },
         init: function () {
-          this.startPosition = null;
+          this.isDragging = false;
+          this.previousMousePosition = { x: 0, y: 0 };
         },
         play: function () {
-          const scene = this.el.sceneEl;
-          scene.addEventListener("touchstart", this.onTouchStart.bind(this));
-          scene.addEventListener("touchmove", this.onTouchMove.bind(this));
-          scene.addEventListener("touchend", this.onTouchEnd.bind(this));
+          const scene = this.el.sceneEl.canvas;
+
+          // إضافة أحداث الماوس
+          scene.addEventListener("mousedown", this.onMouseDown.bind(this));
+          scene.addEventListener("mousemove", this.onMouseMove.bind(this));
+          scene.addEventListener("mouseup", this.onMouseUp.bind(this));
+          scene.addEventListener("mouseleave", this.onMouseLeave.bind(this));
         },
         pause: function () {
-          const scene = this.el.sceneEl;
-          scene.removeEventListener("touchstart", this.onTouchStart.bind(this));
-          scene.removeEventListener("touchmove", this.onTouchMove.bind(this));
-          scene.removeEventListener("touchend", this.onTouchEnd.bind(this));
-        },
-        onTouchStart: function (event) {
-          if (event.touches.length === 1) {
-            this.startPosition = {
-              x: event.touches[0].clientX,
-              y: event.touches[0].clientY,
-            };
-          }
-        },
-        onTouchMove: function (event) {
-          if (event.touches.length === 1 && this.startPosition) {
-            const touch = event.touches[0];
-            const deltaX = touch.clientX - this.startPosition.x;
-            const deltaY = touch.clientY - this.startPosition.y;
+          const scene = this.el.sceneEl.canvas;
 
-            // تدوير النموذج حول المحاور X و Y يدوياً
-            this.el.object3D.rotation.y += deltaX * this.data.rotationSpeed * 0.01;
-            this.el.object3D.rotation.x += deltaY * this.data.rotationSpeed * 0.01;
-
-            this.startPosition = {
-              x: touch.clientX,
-              y: touch.clientY,
-            };
-          }
+          // إزالة أحداث الماوس
+          scene.removeEventListener("mousedown", this.onMouseDown.bind(this));
+          scene.removeEventListener("mousemove", this.onMouseMove.bind(this));
+          scene.removeEventListener("mouseup", this.onMouseUp.bind(this));
+          scene.removeEventListener("mouseleave", this.onMouseLeave.bind(this));
         },
-        onTouchEnd: function () {
-          this.startPosition = null;
+        onMouseDown: function (event) {
+          this.isDragging = true;
+          this.previousMousePosition = { x: event.clientX, y: event.clientY };
+        },
+        onMouseMove: function (event) {
+          if (!this.isDragging) return;
+
+          const deltaX = event.clientX - this.previousMousePosition.x;
+          const deltaY = event.clientY - this.previousMousePosition.y;
+
+          const rotationSpeed = this.data.rotationSpeed * 0.1;
+
+          const object = this.el.object3D.rotation;
+          object.y += deltaX * rotationSpeed;
+          object.x += deltaY * rotationSpeed;
+
+          this.previousMousePosition = { x: event.clientX, y: event.clientY };
+        },
+        onMouseUp: function () {
+          this.isDragging = false;
+        },
+        onMouseLeave: function () {
+          this.isDragging = false;
         },
       });
     </script>
