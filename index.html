@@ -16,7 +16,8 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -5"
         scale="3 3 3"
-        gesture-handler
+        gesture-rotate
+        gesture-scale
         id="model1"
       ></a-entity>
 
@@ -26,52 +27,72 @@
     </a-scene>
 
     <script>
-      // مكون Gesture Handler للتحكم في التدوير والتكبير/التصغير
-      AFRAME.registerComponent("gesture-handler", {
+      // مكون Gesture Rotate: يسمح بتحريك النموذج باستخدام السحب على الشاشة
+      AFRAME.registerComponent("gesture-rotate", {
         schema: {
-          rotationFactor: { type: "number", default: 5 }, // معدل التدوير
-          scaleFactor: { type: "number", default: 0.1 },  // معدل التكبير/التصغير
+          rotationFactor: { type: "number", default: 0.2 }, // معدل التدوير
+        },
+        init: function () {
+          this.startPosition = null;
+        },
+        play: function () {
+          const el = this.el;
+
+          el.sceneEl.addEventListener("touchmove", this.onTouchMove.bind(this));
+        },
+        pause: function () {
+          const el = this.el;
+
+          el.sceneEl.removeEventListener("touchmove", this.onTouchMove.bind(this));
+        },
+        onTouchMove: function (event) {
+          if (event.touches.length === 1) {
+            const touch = event.touches[0];
+
+            if (!this.startPosition) {
+              this.startPosition = { x: touch.clientX, y: touch.clientY };
+              return;
+            }
+
+            const deltaX = touch.clientX - this.startPosition.x;
+            const deltaY = touch.clientY - this.startPosition.y;
+
+            this.el.object3D.rotation.y += deltaX * this.data.rotationFactor * 0.01; // دوران حول المحور Y
+            this.el.object3D.rotation.x -= deltaY * this.data.rotationFactor * 0.01; // دوران حول المحور X
+
+            this.startPosition = { x: touch.clientX, y: touch.clientY };
+          }
+        },
+      });
+
+      // مكون Gesture Scale: يسمح بالتكبير والتصغير
+      AFRAME.registerComponent("gesture-scale", {
+        schema: {
+          scaleFactor: { type: "number", default: 0.01 }, // معدل التكبير/التصغير
         },
         init: function () {
           this.initialScale = this.el.object3D.scale.clone();
-          this.initialRotation = this.el.object3D.rotation.clone();
-          this.startPosition = null;
+        },
+        play: function () {
+          const el = this.el;
 
-          // الاستماع إلى الإيماءات
-          this.el.sceneEl.addEventListener("gesturestart", (event) => {
-            this.startPosition = null;
-          });
+          el.sceneEl.addEventListener("gesturechange", this.onGestureChange.bind(this));
+        },
+        pause: function () {
+          const el = this.el;
 
-          this.el.sceneEl.addEventListener("gesturechange", (event) => {
-            // تكبير أو تصغير
-            if (event.detail.scale) {
-              const newScale = event.detail.scale;
-              this.el.object3D.scale.set(
-                this.initialScale.x * newScale,
-                this.initialScale.y * newScale,
-                this.initialScale.z * newScale
-              );
-            }
-          });
+          el.sceneEl.removeEventListener("gesturechange", this.onGestureChange.bind(this));
+        },
+        onGestureChange: function (event) {
+          if (event.detail.scale) {
+            const scaleChange = event.detail.scale;
 
-          this.el.sceneEl.addEventListener("touchmove", (event) => {
-            if (event.touches.length === 1) {
-              const touch = event.touches[0];
-
-              if (this.startPosition === null) {
-                this.startPosition = { x: touch.clientX, y: touch.clientY };
-                return;
-              }
-
-              const deltaX = touch.clientX - this.startPosition.x;
-              const deltaY = touch.clientY - this.startPosition.y;
-
-              this.el.object3D.rotation.y += deltaX * (this.data.rotationFactor / 1000);
-              this.el.object3D.rotation.x += deltaY * (this.data.rotationFactor / 1000);
-
-              this.startPosition = { x: touch.clientX, y: touch.clientY };
-            }
-          });
+            this.el.object3D.scale.set(
+              this.initialScale.x * scaleChange,
+              this.initialScale.y * scaleChange,
+              this.initialScale.z * scaleChange
+            );
+          }
         },
       });
     </script>
