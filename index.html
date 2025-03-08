@@ -10,9 +10,17 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -3"
         scale="1 1 1"
-        free-rotate
         id="model"
       ></a-entity>
+
+      <!-- علامة الدوران -->
+      <a-circle
+        position="0 0.5 -2.5"
+        radius="0.5"
+        color="#ff5722"
+        rotation-handler
+        id="rotation-control"
+      ></a-circle>
 
       <!-- الإضاءة -->
       <a-light type="directional" intensity="1" position="1 3 1"></a-light>
@@ -20,43 +28,35 @@
     </a-scene>
 
     <script>
-      // مكون الدوران الحر
-      AFRAME.registerComponent("free-rotate", {
+      // مكون التعامل مع علامة الدوران
+      AFRAME.registerComponent("rotation-handler", {
         init: function () {
+          const model = document.querySelector("#model").object3D;
           this.isDragging = false; // لتعقب حالة السحب
           this.previousMousePosition = { x: 0, y: 0 }; // موقع الماوس السابق
 
-          const object = this.el.object3D;
-
-          // عند الضغط على زر الماوس
-          this.el.sceneEl.canvas.addEventListener("mousedown", (event) => {
+          // عند الضغط على العلامة
+          this.el.addEventListener("mousedown", (event) => {
             this.isDragging = true;
             this.previousMousePosition = { x: event.clientX, y: event.clientY };
           });
 
           // عند تحريك الماوس
-          this.el.sceneEl.canvas.addEventListener("mousemove", (event) => {
+          window.addEventListener("mousemove", (event) => {
             if (!this.isDragging) return;
 
             const deltaX = event.clientX - this.previousMousePosition.x;
-            const deltaY = event.clientY - this.previousMousePosition.y;
 
             const rotationSpeed = 0.005; // سرعة الدوران
 
-            // تحديث دوران المجسم بناءً على حركة الماوس
-            object.rotation.y += deltaX * rotationSpeed; // دوران حول المحور Y
-            object.rotation.x += deltaY * rotationSpeed; // دوران حول المحور X
+            // تحديث دوران النموذج بناءً على حركة الماوس
+            model.rotation.y += deltaX * rotationSpeed;
 
             this.previousMousePosition = { x: event.clientX, y: event.clientY };
           });
 
           // عند إفلات زر الماوس
-          this.el.sceneEl.canvas.addEventListener("mouseup", () => {
-            this.isDragging = false;
-          });
-
-          // عند خروج الماوس من النافذة
-          this.el.sceneEl.canvas.addEventListener("mouseleave", () => {
+          window.addEventListener("mouseup", () => {
             this.isDragging = false;
           });
         },
