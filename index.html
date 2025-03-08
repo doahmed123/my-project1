@@ -10,7 +10,7 @@
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
         position="0 1 -5"
         scale="3 3 3"
-        rotation-handler
+        rotation-control
         id="model1"
       ></a-entity>
 
@@ -20,53 +20,52 @@
     </a-scene>
 
     <script>
-      // مكون التحكم اليدوي في دوران النموذج حول جميع المحاور
-      AFRAME.registerComponent("rotation-handler", {
-        schema: { rotationSpeed: { type: "number", default: 0.5 } },
+      // مكون التحكم اليدوي في دوران النموذج
+      AFRAME.registerComponent("rotation-control", {
+        schema: {
+          enabled: { type: "boolean", default: true },
+        },
         init: function () {
           this.isDragging = false;
           this.previousMousePosition = { x: 0, y: 0 };
         },
         play: function () {
-          const scene = this.el.sceneEl.canvas;
+          const sceneCanvas = this.el.sceneEl.canvas;
 
           // إضافة أحداث الماوس
-          scene.addEventListener("mousedown", this.onMouseDown.bind(this));
-          scene.addEventListener("mousemove", this.onMouseMove.bind(this));
-          scene.addEventListener("mouseup", this.onMouseUp.bind(this));
-          scene.addEventListener("mouseleave", this.onMouseLeave.bind(this));
+          sceneCanvas.addEventListener("mousedown", this.onMouseDown.bind(this));
+          sceneCanvas.addEventListener("mousemove", this.onMouseMove.bind(this));
+          sceneCanvas.addEventListener("mouseup", this.onMouseUp.bind(this));
         },
         pause: function () {
-          const scene = this.el.sceneEl.canvas;
+          const sceneCanvas = this.el.sceneEl.canvas;
 
           // إزالة أحداث الماوس
-          scene.removeEventListener("mousedown", this.onMouseDown.bind(this));
-          scene.removeEventListener("mousemove", this.onMouseMove.bind(this));
-          scene.removeEventListener("mouseup", this.onMouseUp.bind(this));
-          scene.removeEventListener("mouseleave", this.onMouseLeave.bind(this));
+          sceneCanvas.removeEventListener("mousedown", this.onMouseDown.bind(this));
+          sceneCanvas.removeEventListener("mousemove", this.onMouseMove.bind(this));
+          sceneCanvas.removeEventListener("mouseup", this.onMouseUp.bind(this));
         },
         onMouseDown: function (event) {
+          if (!this.data.enabled) return;
           this.isDragging = true;
           this.previousMousePosition = { x: event.clientX, y: event.clientY };
         },
         onMouseMove: function (event) {
-          if (!this.isDragging) return;
+          if (!this.isDragging || !this.data.enabled) return;
 
           const deltaX = event.clientX - this.previousMousePosition.x;
           const deltaY = event.clientY - this.previousMousePosition.y;
 
-          const rotationSpeed = this.data.rotationSpeed * 0.1;
+          const rotationSpeed = 0.5; // سرعة الدوران
+          const object = this.el.object3D;
 
-          const object = this.el.object3D.rotation;
-          object.y += deltaX * rotationSpeed;
-          object.x += deltaY * rotationSpeed;
+          // تحديث دوران النموذج
+          object.rotation.y += deltaX * rotationSpeed * 0.01;
+          object.rotation.x += deltaY * rotationSpeed * 0.01;
 
           this.previousMousePosition = { x: event.clientX, y: event.clientY };
         },
         onMouseUp: function () {
-          this.isDragging = false;
-        },
-        onMouseLeave: function () {
           this.isDragging = false;
         },
       });
