@@ -1,54 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene
+      embedded
+    >
+      <!-- إضاءة لتحسين جودة العرض -->
+      <a-light type="directional" intensity="1" position="1 2 3"></a-light>
+      <a-light type="ambient" intensity="0.5"></a-light>
 
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>WebXR 3D Model</title>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/loaders/GLTFLoader.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/webxr/ARButton.js"></script>
-      </head>
-      <body style="margin: 0; overflow: hidden;">
-      
-      <script>
-        // إعداد المشهد، الكاميرا، والمُصَيِّر
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.xr.enabled = true;
-        document.body.appendChild(renderer.domElement);
-      
-        // زر تفعيل الواقع المعزز
-        document.body.appendChild(THREE.ARButton.createButton(renderer));
-      
-        // إضافة إضاءة للمشهد
-        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-        light.position.set(0.5, 1, 0.25);
-        scene.add(light);
-      
-        // تحميل النموذج ثلاثي الأبعاد
-        const loader = new THREE.GLTFLoader();
-        loader.load(
-          ' https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb', // ضع مسار ملف النموذج هنا
-          function (gltf) {
-            const model = gltf.scene;
-            model.scale.set(0.2, 0.2, 0.2); // تغيير الحجم إذا لزم الأمر
-            scene.add(model);
-      
-            // تتبع الموقع في الواقع المعزز
-            renderer.setAnimationLoop(() => {
-              renderer.render(scene, camera);
-            });
-          },
-          undefined,
-          function (error) {
-            console.error('حدث خطأ أثناء تحميل النموذج:', error);
-          }
-        );
-      </script>
-      
-      </body>
-      </html>
-      
+      <!-- النموذج ثلاثي الأبعاد -->
+      <a-entity
+        id="model"
+        gltf-model="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
+        position="0 1 -3"
+        scale="0.5 0.5 0.5"
+        rotation="0 0 0"
+      ></a-entity>
+    </a-scene>
+
+    <script>
+      const model = document.querySelector("#model");
+      let isMouseDown = false;
+      let previousMousePosition = { x: 0, y: 0 };
+
+      // وظيفة تحديث دوران النموذج
+      const updateModelRotation = (deltaX, deltaY) => {
+        const rotation = model.getAttribute("rotation");
+        model.setAttribute("rotation", {
+          x: rotation.x + deltaY * 0.5, // تدوير النموذج عموديًا
+          y: rotation.y + deltaX * 0.5, // تدوير النموذج أفقيًا
+          z: rotation.z,
+        });
+      };
+
+      // التعامل مع حركة الماوس
+      window.addEventListener("mousedown", (event) => {
+        isMouseDown = true;
+        previousMousePosition = { x: event.clientX, y: event.clientY };
+      });
+
+      window.addEventListener("mouseup", () => {
+        isMouseDown = false;
+      });
+
+      window.addEventListener("mousemove", (event) => {
+        if (!isMouseDown) return;
+
+        const deltaX = event.clientX - previousMousePosition.x;
+        const deltaY = event.clientY - previousMousePosition.y;
+
+        updateModelRotation(deltaX, deltaY);
+        previousMousePosition = { x: event.clientX, y: event.clientY };
+      });
+
+      // التعامل مع اللمس
+      window.addEventListener("touchstart", (event) => {
+        const touch = event.touches[0];
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
+      });
+
+      window.addEventListener("touchmove", (event) => {
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - previousMousePosition.x;
+        const deltaY = touch.clientY - previousMousePosition.y;
+
+        updateModelRotation(deltaX, deltaY);
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
+      });
+    </script>
+  </body>
+</html>
