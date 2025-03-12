@@ -18,32 +18,38 @@
       <a-entity
         id="pyramid-model"
         gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
-        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/the_great_pyramid_of_giza_egypt.glb"
+        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/cleopatra_-_egyptian_queen (1).glb"
         position="0 1 0"
         scale="0.3 0.3 0.3"
         rotation="0 0 0"
       >
-        
+    </a-entity>
       <!-- النص التعريفي -->
       <a-text
-        id="pyramid-info"
-        value="الأهرامات: أعجوبة معمارية"
+        id="info-text"
+        value="The Pyramids: An Architectural Wonder"
         align="center"
         position="0 2 0"
-        scale="2 2 2"
-        color="black"
+        scale="3 3 3"
+        color="blue"
         visible="false"
       ></a-text>
     </a-scene>
-    <script>
-      // استهداف النموذج والنص التعريفي
-      const pyramidModel = document.querySelector("#pyramid-model");
-      const pyramidInfo = document.querySelector("#pyramid-info");
 
-      // التأكد من إظهار النص عند تحميل النموذج
-      pyramidModel.addEventListener("model-loaded", () => {
-        pyramidInfo.setAttribute("visible", "true");
+</a-entity>
+    <script>
+      // استهداف المجسم والنص
+      const pyramidModel = document.querySelector("#pyramid-model");
+      const infoText = document.querySelector("#info-text");
+
+      // إضافة حدث عند النقر على المجسم
+      pyramidModel.addEventListener("click", () => {
+        // تبديل حالة الظهور
+        const isVisible = infoText.getAttribute("visible") === "true";
+        infoText.setAttribute("visible", !isVisible);
       });
+      
+/////////////////////////////////////////////////////
 
       // دوران النموذج باستخدام الماوس أو اللمس
       let isMouseDown = false;
