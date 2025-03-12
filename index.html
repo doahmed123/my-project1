@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AR GPS Interaction</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #fullscreen-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        z-index: 1000;
+      }
+      #fullscreen-btn:hover {
+        background: rgba(0, 0, 0, 0.8);
+      }
+      #info-box {
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        z-index: 1000;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="fullscreen-btn">Enter Fullscreen</button>
+    <div id="info-box"></div>
+
+    <a-scene
+      embedded
+      arjs="sourceType: webcam; trackingMethod: gps; debugUIEnabled: false; videoTexture: true;"
+      renderer="antialias: true; alpha: true;"
+      vr-mode-ui="enabled: false;"
+      device-orientation-permission-ui="enabled: true"
+    >
+      <!-- إضاءة لتحسين عرض المجسم -->
+      <a-light type="ambient" intensity="0.8"></a-light>
+      <a-light type="directional" intensity="1.2" position="1 2 1"></a-light>
+
+      <!-- المجسم ثلاثي الأبعاد -->
+      <a-entity
+        id="model"
+        gps-entity-place="latitude: 40.748817; longitude: -73.985428;"
+        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/cleopatra_-_egyptian_queen (1).glb"
+        position="0 1 0"
+        scale="0.4 0.4 0.4"
+        rotation="0 0 0"
+        class="clickable"
+      ></a-entity>
+    </a-scene>
+
+    <script>
+      const model = document.querySelector("#model");
+      const fullscreenButton = document.getElementById("fullscreen-btn");
+      const infoBox = document.getElementById("info-box");
+
+      // التحكم في وضع ملء الشاشة
+      fullscreenButton.addEventListener("click", () => {
+        const scene = document.querySelector("a-scene");
+        if (!document.fullscreenElement) {
+          scene.requestFullscreen()
+            .then(() => {
+              console.log("Fullscreen enabled");
+            })
+            .catch((err) => {
+              alert(`Error attempting to enable fullscreen mode: ${err.message}`);
+            });
+        } else {
+          document.exitFullscreen();
+        }
+      });
+
+      // عرض اسم المجسم وتاريخه عند النقر
+      model.addEventListener("loaded", () => {
+        model.addEventListener("click", (e) => {
+          infoBox.innerHTML = `
+            <strong>اسم المجسم:</strong> كليوباترا<br>
+            <strong>التاريخ:</strong> الملكة المصرية القديمة، القرن الأول قبل الميلاد.
+          `;
+          infoBox.style.display = "block";
+
+          // إخفاء المعلومات بعد 5 ثوانٍ
+          setTimeout(() => {
+            infoBox.style.display = "none";
+          }, 5000);
+        });
+      });
+
+      // التحكم في دوران المجسم باستخدام الماوس
+      let isMouseDown = false;
+      let previousMousePosition = { x: 0, y: 0 };
+
+      const updateRotation = (deltaX, deltaY) => {
+        const rotation = model.getAttribute("rotation");
+        model.setAttribute("rotation", {
+          x: rotation.x + deltaY * 0.2,
+          y: rotation.y + deltaX * 0.2,
+          z: rotation.z,
+        });
+      };
+
+      window.addEventListener("mousedown", (event) => {
+        isMouseDown = true;
+        previousMousePosition = { x: event.clientX, y: event.clientY };
+      });
+
+      window.addEventListener("mouseup", () => {
+        isMouseDown = false;
+      });
+
+      window.addEventListener("mousemove", (event) => {
+        if (!isMouseDown) return;
+
+        const deltaX = event.clientX - previousMousePosition.x;
+        const deltaY = event.clientY - previousMousePosition.y;
+
+        updateRotation(deltaX, deltaY);
+        previousMousePosition = { x: event.clientX, y: event.clientY };
+      });
+
+      // التحكم في تحريك المجسم (Position) باستخدام الأسهم
+      window.addEventListener("keydown", (event) => {
+        const position = model.getAttribute("position");
+
+        switch (event.key) {
+          case "ArrowUp":
+            position.z -= 0.1;
+            break;
+          case "ArrowDown":
+            position.z += 0.1;
+            break;
+          case "ArrowLeft":
+            position.x -= 0.1;
+            break;
+          case "ArrowRight":
+            position.x += 0.1;
+            break;
+        }
+
+        model.setAttribute("position", position);
+      });
+
+      // تكبير وتصغير المجسم باستخدام عجلة الماوس
+      window.addEventListener("wheel", (event) => {
+        const scale = model.getAttribute("scale");
+        const scaleChange = event.deltaY * -0.001;
+
+        const newScale = {
+          x: Math.max(0.1, scale.x + scaleChange),
+          y: Math.max(0.1, scale.y + scaleChange),
+          z: Math.max(0.1, scale.z + scaleChange),
+        };
+
+        model.setAttribute("scale", newScale);
+      });
+    </script>
+  </body>
+</html>
