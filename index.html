@@ -6,6 +6,8 @@
     <title>AR GPS Interaction</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+
     <style>
       body {
         margin: 0;
@@ -104,8 +106,8 @@
         },
         {
           id: "model2",
-          name: "مجسم آخر",
-          description: "وصف النموذج الثاني.",
+          name: "مجسم الهرم",
+          description: "مجسم يظهر أهمية الهندسة المعمارية في الحضارة المصرية.",
         },
       ];
 
@@ -125,8 +127,6 @@
               `اسم المجسم: ${modelData.name}. الوصف: ${modelData.description}.`
             );
             utterance.lang = "ar"; // اللغة العربية
-            utterance.pitch = 1; // طبقة الصوت
-            utterance.rate = 1; // سرعة الصوت
             speechSynthesis.speak(utterance);
 
             // إخفاء المعلومات بعد 5 ثوانٍ
