@@ -1,122 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AR GPS Interaction</title>
+    <title>AR GPS 3D Models Interaction</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
-    
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-      }
-      #info-box {
-        position: absolute;
-        top: 50px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        display: none;
-        z-index: 1000;
-        font-size: 16px;
-      }
-    </style>
   </head>
-  <body>
-    <div id="info-box"></div>
-
+  <body style="margin: 0; overflow: hidden;">
     <a-scene
       embedded
-      arjs="sourceType: webcam; trackingMethod: gps; debugUIEnabled: false; videoTexture: true;"
-      renderer="antialias: true; alpha: true;"
-      vr-mode-ui="enabled: false;"
-      device-orientation-permission-ui="enabled: true"
+      arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: gps;"
     >
-      <!-- إضاءة لتحسين عرض المجسم -->
+      <!-- الإضاءة لتحسين العرض -->
+      <a-light type="directional" intensity="1" position="1 2 3"></a-light>
       <a-light type="ambient" intensity="0.8"></a-light>
-      <a-light type="directional" intensity="1.2" position="1 2 1"></a-light>
 
-      <!-- المجسم الأول -->
+      <!-- النموذج الأول: الأهرامات -->
       <a-entity
-        id="model1"
-        gps-entity-place="latitude: 40.748817; longitude: -73.985428;"
+        id="pyramid-model"
+        gps-entity-place="latitude: 28.128135; longitude: 30.747033;"
         gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/cleopatra_-_egyptian_queen (1).glb"
-        position="0 1 0"
-        scale="0.4 0.4 0.4"
-        rotation="0 0 0"
-        class="clickable"
-      ></a-entity>
-
-      <!-- المجسم الثاني -->
-      <a-entity
-        id="model2"
-        gps-entity-place="latitude: 40.748900; longitude: -73.984000;"
-        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/pyramidion_van_ptahemwia.glb"
         position="0 1 0"
         scale="0.3 0.3 0.3"
         rotation="0 0 0"
-        class="clickable"
-      ></a-entity>
+      >
+    </a-entity>
     </a-scene>
 
     <script>
-      const infoBox = document.getElementById("info-box");
+      // استهداف المجسم والنص
+      const pyramidModel = document.querySelector("#pyramid-model");
 
-      // عرض معلومات عن المجسمات عند النقر
-      const models = [
-        {
-          id: "model1",
-          name: "كليوباترا",
-          description: "الملكة المصرية القديمة، القرن الأول قبل الميلاد.",
-        },
-        {
-          id: "model2",
-          name: "مجسم الهرم",
-          description: "مجسم يظهر أهمية الهندسة المعمارية في الحضارة المصرية.",
-        },
-      ];
+/////////////////////////////////////////////////////
 
-      models.forEach((modelData) => {
-        const model = document.querySelector(`#${modelData.id}`);
-
-        model.addEventListener("loaded", () => {
-          model.addEventListener("click", () => {
-            infoBox.innerHTML = `
-              <strong>اسم المجسم:</strong> ${modelData.name}<br>
-              <strong>الوصف:</strong> ${modelData.description}
-            `;
-            infoBox.style.display = "block";
-
-            // تشغيل الصوت باستخدام SpeechSynthesis
-            const utterance = new SpeechSynthesisUtterance(
-              `اسم المجسم: ${modelData.name}. الوصف: ${modelData.description}.`
-            );
-            utterance.lang = "ar"; // اللغة العربية
-            speechSynthesis.speak(utterance);
-
-            // إخفاء المعلومات بعد 5 ثوانٍ
-            setTimeout(() => {
-              infoBox.style.display = "none";
-            }, 5000);
-          });
-        });
-      });
-
-      // التحكم في دوران المجسم باستخدام الماوس
+      // دوران النموذج باستخدام الماوس أو اللمس
       let isMouseDown = false;
       let previousMousePosition = { x: 0, y: 0 };
 
       const updateRotation = (model, deltaX, deltaY) => {
         const rotation = model.getAttribute("rotation");
         model.setAttribute("rotation", {
-          x: rotation.x + deltaY * 0.2,
-          y: rotation.y + deltaX * 0.2,
-          z: rotation.z,
+          x: rotation.x + deltaY * 0.2, // تدوير حول المحور X
+          y: rotation.y + deltaX * 0.2, // تدوير حول المحور Y
+          z: rotation.z, // الإبقاء على المحور Z ثابتًا
         });
       };
 
@@ -135,56 +60,87 @@
         const deltaX = event.clientX - previousMousePosition.x;
         const deltaY = event.clientY - previousMousePosition.y;
 
-        models.forEach(({ id }) => {
-          const model = document.querySelector(`#${id}`);
-          updateRotation(model, deltaX, deltaY);
-        });
-
+        updateRotation(pyramidModel, deltaX, deltaY);
         previousMousePosition = { x: event.clientX, y: event.clientY };
       });
 
-      // التحكم في تحريك المجسمات باستخدام الأسهم
-      window.addEventListener("keydown", (event) => {
-        models.forEach(({ id }) => {
-          const model = document.querySelector(`#${id}`);
-          const position = model.getAttribute("position");
-
-          switch (event.key) {
-            case "ArrowUp":
-              position.z -= 0.1;
-              break;
-            case "ArrowDown":
-              position.z += 0.1;
-              break;
-            case "ArrowLeft":
-              position.x -= 0.1;
-              break;
-            case "ArrowRight":
-              position.x += 0.1;
-              break;
-          }
-
-          model.setAttribute("position", position);
-        });
+      window.addEventListener("touchstart", (event) => {
+        const touch = event.touches[0];
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
       });
 
-      // تكبير وتصغير المجسمات باستخدام عجلة الماوس
-      window.addEventListener("wheel", (event) => {
-        const scaleChange = event.deltaY * -0.001;
+      window.addEventListener("touchmove", (event) => {
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - previousMousePosition.x;
+        const deltaY = touch.clientY - previousMousePosition.y;
 
-        models.forEach(({ id }) => {
-          const model = document.querySelector(`#${id}`);
-          const scale = model.getAttribute("scale");
-
-          const newScale = {
-            x: Math.max(0.1, scale.x + scaleChange),
-            y: Math.max(0.1, scale.y + scaleChange),
-            z: Math.max(0.1, scale.z + scaleChange),
-          };
-
-          model.setAttribute("scale", newScale);
-        });
+        updateRotation(pyramidModel, deltaX, deltaY);
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
       });
+
+             // ****************************************************************************** //
+             
+// تكبير وتصغير باستخدام عجلة الماوس
+window.addEventListener("wheel", (event) => {
+  event.preventDefault();
+
+  // الحصول على المقياس الحالي
+  const scale = pyramidModel.getAttribute("scale");
+  let newScale = {
+    x: scale.x + event.deltaY * -0.001, // تعديل الحجم بناءً على حركة العجلة
+    y: scale.y + event.deltaY * -0.001,
+    z: scale.z + event.deltaY * -0.001,
+  };
+
+  // الحد الأدنى والأقصى للحجم
+  newScale.x = Math.max(0.1, Math.min(5, newScale.x));
+  newScale.y = Math.max(0.1, Math.min(5, newScale.y));
+  newScale.z = Math.max(0.1, Math.min(5, newScale.z));
+
+  // تحديث الحجم
+  pyramidModel.setAttribute("scale", newScale);
+});
+
+// تكبير وتصغير باستخدام اللمس (إيماءة Pinch-to-Zoom)
+let initialDistance = null;
+
+window.addEventListener("touchmove", (event) => {
+  if (event.touches.length === 2) {
+    // حساب المسافة بين الإصبعين
+    const dx = event.touches[0].clientX - event.touches[1].clientX;
+    const dy = event.touches[0].clientY - event.touches[1].clientY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (initialDistance === null) {
+      initialDistance = distance;
+      return;
+    }
+
+    const scaleChange = (distance - initialDistance) * 0.005;
+    const scale = pyramidModel.getAttribute("scale");
+    let newScale = {
+      x: scale.x + scaleChange,
+      y: scale.y + scaleChange,
+      z: scale.z + scaleChange,
+    };
+
+    // الحد الأدنى والأقصى للحجم
+    newScale.x = Math.max(0.1, Math.min(5, newScale.x));
+    newScale.y = Math.max(0.1, Math.min(5, newScale.y));
+    newScale.z = Math.max(0.1, Math.min(5, newScale.z));
+
+    // تحديث الحجم
+    pyramidModel.setAttribute("scale", newScale);
+
+    // تحديث المسافة الأولية
+    initialDistance = distance;
+  }
+});
+
+window.addEventListener("touchend", () => {
+  // إعادة تعيين المسافة الأولية عند انتهاء اللمس
+  initialDistance = null;
+});
     </script>
   </body>
 </html>
