@@ -7,7 +7,6 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-
     <style>
       body {
         margin: 0;
@@ -50,7 +49,7 @@
     <a-scene
       embedded
       arjs="sourceType: webcam; trackingMethod: gps; debugUIEnabled: false; videoTexture: true;"
-      renderer="antialias: true; alpha: true;"
+      renderer="antialias: true; alpha: true; precision: medium;"
       vr-mode-ui="enabled: false;"
       device-orientation-permission-ui="enabled: true"
     >
@@ -62,11 +61,12 @@
       <a-entity
         id="model1"
         gps-entity-place="latitude: 40.748817; longitude: -73.985428;"
-        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/cleopatra_-_egyptian_queen (1).glb"
+        gltf-model="https://raw.githubusercontent.com/doahmed123/my-project1/main/cleopatra_-_egyptian_queen%20(1).glb"
         position="0 1 0"
         scale="0.4 0.4 0.4"
         rotation="0 0 0"
         class="clickable"
+        shadow="cast: true; receive: true"
       ></a-entity>
 
       <!-- المجسم الثاني -->
@@ -78,6 +78,7 @@
         scale="0.3 0.3 0.3"
         rotation="0 0 0"
         class="clickable"
+        shadow="cast: true; receive: true"
       ></a-entity>
     </a-scene>
 
@@ -134,85 +135,6 @@
               infoBox.style.display = "none";
             }, 5000);
           });
-        });
-      });
-
-      // التحكم في دوران المجسم باستخدام الماوس
-      let isMouseDown = false;
-      let previousMousePosition = { x: 0, y: 0 };
-
-      const updateRotation = (model, deltaX, deltaY) => {
-        const rotation = model.getAttribute("rotation");
-        model.setAttribute("rotation", {
-          x: rotation.x + deltaY * 0.2,
-          y: rotation.y + deltaX * 0.2,
-          z: rotation.z,
-        });
-      };
-
-      window.addEventListener("mousedown", (event) => {
-        isMouseDown = true;
-        previousMousePosition = { x: event.clientX, y: event.clientY };
-      });
-
-      window.addEventListener("mouseup", () => {
-        isMouseDown = false;
-      });
-
-      window.addEventListener("mousemove", (event) => {
-        if (!isMouseDown) return;
-
-        const deltaX = event.clientX - previousMousePosition.x;
-        const deltaY = event.clientY - previousMousePosition.y;
-
-        models.forEach(({ id }) => {
-          const model = document.querySelector(`#${id}`);
-          updateRotation(model, deltaX, deltaY);
-        });
-
-        previousMousePosition = { x: event.clientX, y: event.clientY };
-      });
-
-      // التحكم في تحريك المجسمات باستخدام الأسهم
-      window.addEventListener("keydown", (event) => {
-        models.forEach(({ id }) => {
-          const model = document.querySelector(`#${id}`);
-          const position = model.getAttribute("position");
-
-          switch (event.key) {
-            case "ArrowUp":
-              position.z -= 0.1;
-              break;
-            case "ArrowDown":
-              position.z += 0.1;
-              break;
-            case "ArrowLeft":
-              position.x -= 0.1;
-              break;
-            case "ArrowRight":
-              position.x += 0.1;
-              break;
-          }
-
-          model.setAttribute("position", position);
-        });
-      });
-
-      // تكبير وتصغير المجسمات باستخدام عجلة الماوس
-      window.addEventListener("wheel", (event) => {
-        const scaleChange = event.deltaY * -0.001;
-
-        models.forEach(({ id }) => {
-          const model = document.querySelector(`#${id}`);
-          const scale = model.getAttribute("scale");
-
-          const newScale = {
-            x: Math.max(0.1, scale.x + scaleChange),
-            y: Math.max(0.1, scale.y + scaleChange),
-            z: Math.max(0.1, scale.z + scaleChange),
-          };
-
-          model.setAttribute("scale", newScale);
         });
       });
     </script>
