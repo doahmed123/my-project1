@@ -62,11 +62,15 @@
         rotation="0 0 0"
         class="clickable"
       ></a-entity>
+      <a-entity
+
+></a-entity>
     </a-scene>
 
     <script>
       const infoBox = document.getElementById("info-box");
 
+      // عرض معلومات عن المجسمات عند النقر
       const models = [
         {
           id: "model1",
@@ -91,12 +95,14 @@
             `;
             infoBox.style.display = "block";
 
+            // تشغيل الصوت باستخدام SpeechSynthesis
             const utterance = new SpeechSynthesisUtterance(
               `اسم المجسم: ${modelData.name}. الوصف: ${modelData.description}.`
             );
-            utterance.lang = "ar";
+            utterance.lang = "ar"; // اللغة العربية
             speechSynthesis.speak(utterance);
 
+            // إخفاء المعلومات بعد 5 ثوانٍ
             setTimeout(() => {
               infoBox.style.display = "none";
             }, 5000);
@@ -104,9 +110,23 @@
         });
       });
 
-      // دعم التحكم باللمس
-      let isTouching = false;
-      let previousTouchPosition = { x: 0, y: 0 };
+      // إشعار في حالة عدم تمكين GPS
+      if (!navigator.geolocation) {
+        alert("جهازك لا يدعم خاصية GPS.");
+      } else {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log("تم تحديد الموقع:", position.coords);
+          },
+          (error) => {
+            alert("لم يتمكن من تحديد الموقع. يرجى تمكين GPS.");
+          }
+        );
+      }
+
+      // التحكم في دوران المجسم باستخدام الماوس
+      let isMouseDown = false;
+      let previousMousePosition = { x: 0, y: 0 };
 
       const updateRotation = (model, deltaX, deltaY) => {
         const rotation = model.getAttribute("rotation");
@@ -117,64 +137,70 @@
         });
       };
 
-      window.addEventListener("touchstart", (event) => {
-        if (event.touches.length === 1) {
-          isTouching = true;
-          const touch = event.touches[0];
-          previousTouchPosition = { x: touch.clientX, y: touch.clientY };
-        }
+      window.addEventListener("mousedown", (event) => {
+        isMouseDown = true;
+        previousMousePosition = { x: event.clientX, y: event.clientY };
       });
 
-      window.addEventListener("touchmove", (event) => {
-        if (isTouching && event.touches.length === 1) {
-          const touch = event.touches[0];
-          const deltaX = touch.clientX - previousTouchPosition.x;
-          const deltaY = touch.clientY - previousTouchPosition.y;
+      window.addEventListener("mouseup", () => {
+        isMouseDown = false;
+      });
 
-          models.forEach(({ id }) => {
-            const model = document.querySelector(`#${id}`);
-            updateRotation(model, deltaX, deltaY);
-          });
+      window.addEventListener("mousemove", (event) => {
+        if (!isMouseDown) return;
 
-          previousTouchPosition = { x: touch.clientX, y: touch.clientY };
-        }
+        const deltaX = event.clientX - previousMousePosition.x;
+        const deltaY = event.clientY - previousMousePosition.y;
 
-        if (event.touches.length === 2) {
-          const touch1 = event.touches[0];
-          const touch2 = event.touches[1];
+        models.forEach(({ id }) => {
+          const model = document.querySelector(`#${id}`);
+          updateRotation(model, deltaX, deltaY);
+        });
 
-          const currentDistance = Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) +
-              Math.pow(touch2.clientY - touch1.clientY, 2)
-          );
+        previousMousePosition = { x: event.clientX, y: event.clientY };
+      });
 
-          if (!window.initialDistance) {
-            window.initialDistance = currentDistance;
-            return;
+      // التحكم في تحريك المجسمات باستخدام الأسهم
+      window.addEventListener("keydown", (event) => {
+        models.forEach(({ id }) => {
+          const model = document.querySelector(`#${id}`);
+          const position = model.getAttribute("position");
+
+          switch (event.key) {
+            case "ArrowUp":
+              position.z -= 0.1;
+              break;
+            case "ArrowDown":
+              position.z += 0.1;
+              break;
+            case "ArrowLeft":
+              position.x -= 0.1;
+              break;
+            case "ArrowRight":
+              position.x += 0.1;
+              break;
           }
 
-          const scaleChange = (currentDistance - window.initialDistance) * 0.005;
-
-          models.forEach(({ id }) => {
-            const model = document.querySelector(`#${id}`);
-            const scale = model.getAttribute("scale");
-
-            const newScale = {
-              x: Math.max(0.1, scale.x + scaleChange),
-              y: Math.max(0.1, scale.y + scaleChange),
-              z: Math.max(0.1, scale.z + scaleChange),
-            };
-
-            model.setAttribute("scale", newScale);
-          });
-
-          window.initialDistance = currentDistance;
-        }
+          model.setAttribute("position", position);
+        });
       });
 
-      window.addEventListener("touchend", () => {
-        isTouching = false;
-        window.initialDistance = null;
+      // تكبير وتصغير المجسمات باستخدام عجلة الماوس
+      window.addEventListener("wheel", (event) => {
+        const scaleChange = event.deltaY * -0.001;
+
+        models.forEach(({ id }) => {
+          const model = document.querySelector(`#${id}`);
+          const scale = model.getAttribute("scale");
+
+          const newScale = {
+            x: Math.max(0.1, scale.x + scaleChange),
+            y: Math.max(0.1, scale.y + scaleChange),
+            z: Math.max(0.1, scale.z + scaleChange),
+          };
+
+          model.setAttribute("scale", newScale);
+        });
       });
     </script>
   </body>
